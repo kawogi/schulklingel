@@ -1,104 +1,96 @@
-/**
- * Blink
- *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
- */
 #include "Arduino.h"
 
-// Set LED_BUILTIN if it is not defined by Arduino framework
-// #define LED_BUILTIN 13
+// Der Pin an welchem der Lautsprecher angeschlossen ist
+#define LAUTSPRECHER_PIN PIND6
+
+// Nummern der Halbtöne
+#define NOTE_C 0
+#define NOTE_CIS 1
+#define NOTE_D 2
+#define NOTE_DIS 3
+#define NOTE_E 4
+#define NOTE_F 5
+#define NOTE_FIS 6
+#define NOTE_G 7
+#define NOTE_GIS 8
+#define NOTE_A 9
+#define NOTE_AIS 10
+#define NOTE_H 11
 
 void setup()
 {
-  // initialize LED digital pin as an output.
+  // Den Pin des Lautsprechers auf "Ausgabe" umschalten
   pinMode(PIND6, OUTPUT);
 }
 
-const int NOTE_C3 = (int)(1000000.0 / (440.0 * pow(2.0, -21.0 / 12.0)));
-const int NOTE_D3 = (int)(1000000.0 / (440.0 * pow(2.0, -19.0 / 12.0)));
-const int NOTE_E3 = (int)(1000000.0 / (440.0 * pow(2.0, -17.0 / 12.0)));
-const int NOTE_F3 = (int)(1000000.0 / (440.0 * pow(2.0, -16.0 / 12.0)));
-const int NOTE_G3 = (int)(1000000.0 / (440.0 * pow(2.0, -14.0 / 12.0)));
-const int NOTE_A3 = (int)(1000000.0 / (440.0 * pow(2.0, -12.0 / 12.0)));
-const int NOTE_H3 = (int)(1000000.0 / (440.0 * pow(2.0, -10.0 / 12.0)));
-const int NOTE_C4 = (int)(1000000.0 / (440.0 * pow(2.0, -9.0 / 12.0)));
-const int NOTE_D4 = (int)(1000000.0 / (440.0 * pow(2.0, -7.0 / 12.0)));
-const int NOTE_E4 = (int)(1000000.0 / (440.0 * pow(2.0, -5.0 / 12.0)));
-const int NOTE_F4 = (int)(1000000.0 / (440.0 * pow(2.0, -4.0 / 12.0)));
-const int NOTE_G4 = (int)(1000000.0 / (440.0 * pow(2.0, -2.0 / 12.0)));
-const int NOTE_A4 = (int)(1000000.0 / (440.0 * pow(2.0, 0.0 / 12.0)));
-const int NOTE_H4 = (int)(1000000.0 / (440.0 * pow(2.0, 2.0 / 12.0)));
-const int NOTE_C5 = (int)(1000000.0 / (440.0 * pow(2.0, 3.0 / 12.0)));
-
-void spieleG4Fuer815ms()
+/// @brief Berechnet die Frequenz einer Note
+/// @param note Nummer des Halbtons innerhalb einer Oktave (C = 0)
+/// @param oktave Nummer der Oktave
+/// @return die berechnete Frequenz in Hz
+float frequenz(int note, int oktave)
 {
-  int anzahl = 815000 / NOTE_G4;
+  // setze Kammerton A4 = 440 Hz als Referenz für alle anderen Noten
+  const int BASISFREQUENZ = 440;
+  const int BASISOKTAVE = 4;
+  // A ist der 9. Halbton in einer Oktave
+  const int BASISNOTE = 9;
+  // Gleichstufige Stimmung: https://de.wikipedia.org/wiki/Gleichstufige_Stimmung#Frequenzberechnung
+  return BASISFREQUENZ * pow(2.0, (oktave - BASISOKTAVE) + (note - BASISNOTE) / 12.0);
+}
+
+// einige vorberechnete Tonfrequenzen für übliche Melodien
+const int FREQUENZ_C3 = frequenz(NOTE_C, 3);
+const int FREQUENZ_D3 = frequenz(NOTE_D, 3);
+const int FREQUENZ_E3 = frequenz(NOTE_E, 3);
+const int FREQUENZ_F3 = frequenz(NOTE_F, 3);
+const int FREQUENZ_G3 = frequenz(NOTE_G, 3);
+const int FREQUENZ_A3 = frequenz(NOTE_A, 3);
+const int FREQUENZ_H3 = frequenz(NOTE_H, 3);
+const int FREQUENZ_C4 = frequenz(NOTE_C, 4);
+const int FREQUENZ_D4 = frequenz(NOTE_D, 4);
+const int FREQUENZ_E4 = frequenz(NOTE_E, 4);
+const int FREQUENZ_F4 = frequenz(NOTE_F, 4);
+const int FREQUENZ_G4 = frequenz(NOTE_G, 4);
+const int FREQUENZ_A4 = frequenz(NOTE_A, 4);
+const int FREQUENZ_H4 = frequenz(NOTE_H, 4);
+const int FREQUENZ_C5 = frequenz(NOTE_C, 4);
+
+/// @brief Spielt den Ton als Rechteckwelle auf dem Lautsprecher ab.
+///
+/// Die Funktion blockiert so lange, bis der Ton abgeschlossen ist
+///
+/// @param frequenz die Tonfrequenz in Hertz (Hz)
+/// @param dauer_ms die Dauer des Tons in Millisekunden
+void spieleTon(float frequenz, int dauer_ms)
+{
+  // die Dauer einer einzelnen Periode in Mikrosekunden (µs)
+  int periodendauer_us = (int)round(1000000.0 / frequenz);
+
+  // die Anzahl der abzuspielenden Perioden, um die gewünschte Dauer zu erreichen
+  int anzahl = dauer_ms * frequenz / 1000;
   for (int i = 0; i < anzahl; i++)
   {
-    // Spiele Note
-    const int NOTE = NOTE_G4 / 2;
-
-    digitalWrite(PIND6, HIGH);
-    delayMicroseconds(NOTE);
-    digitalWrite(PIND6, LOW);
-    delayMicroseconds(NOTE);
+    digitalWrite(LAUTSPRECHER_PIN, HIGH);
+    delayMicroseconds(periodendauer_us / 2);
+    digitalWrite(LAUTSPRECHER_PIN, LOW);
+    delayMicroseconds(periodendauer_us / 2);
   }
 }
-void spieleE4Fuer815ms()
-{
-  int anzahl = 815000 / NOTE_E4;
-  for (int i = 0; i < anzahl; i++)
-  {
-    // Spiele Note
-    const int NOTE = NOTE_E4 / 2;
 
-    digitalWrite(PIND6, HIGH);
-    delayMicroseconds(NOTE);
-    digitalWrite(PIND6, LOW);
-    delayMicroseconds(NOTE);
-  }
-}
-void spieleC4Fuer815ms()
+/// @brief Spielt die gesamte Tonfolge der Schulglocke ab
+///
+/// Die Funktion blockiert so lange, bis die Tonfolge abgeschlossen ist
+void spieleTonfolge()
 {
-  int anzahl = 815000 / NOTE_C4;
-  for (int i = 0; i < anzahl; i++)
-  {
-    // Spiele Note
-    const int NOTE = NOTE_C4 / 2;
-
-    digitalWrite(PIND6, HIGH);
-    delayMicroseconds(NOTE);
-    digitalWrite(PIND6, LOW);
-    delayMicroseconds(NOTE);
-  }
-}
-void spieleG3Fuer815ms()
-{
-  int anzahl = 2 * 815000 / NOTE_G3;
-  for (int i = 0; i < anzahl; i++)
-  {
-    // Spiele Note
-    const int NOTE = NOTE_G3 / 2;
-
-    digitalWrite(PIND6, HIGH);
-    delayMicroseconds(NOTE);
-    digitalWrite(PIND6, LOW);
-    delayMicroseconds(NOTE);
-  }
+  spieleTon(FREQUENZ_G4, 820);
+  spieleTon(FREQUENZ_E4, 820);
+  spieleTon(FREQUENZ_C4, 820);
+  spieleTon(FREQUENZ_G3, 1640);
 }
 
 void loop()
 {
-  // Spiele G4 für ca. 815ms
-  spieleG4Fuer815ms();
-
-  // Spiele E4 für ca. 794ms
-  spieleE4Fuer815ms();
-  // Spiele C4 für ca. 841ms
-  spieleC4Fuer815ms();
-  // Spiele G3 für ca. 1.633s
-  spieleG3Fuer815ms();
+  spieleTonfolge();
 
   delay(2000);
 }
