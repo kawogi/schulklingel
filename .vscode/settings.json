@@ -1,0 +1,19 @@
+{
+    "rust-analyzer.cargo.target": "avr-none",
+    "rust-analyzer.rustfmt.extraArgs": [
+        "+stable"
+    ],
+    "rust-analyzer.check.targets": [
+        "avr-none",
+    ],
+    "cSpell.words": [
+        "anzahl",
+        "arduino",
+        "dauer",
+        "frequenz",
+        "lautsprecher",
+        "oktave",
+        "ufmt",
+        "uwriteln"
+    ]
+}
