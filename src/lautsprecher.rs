@@ -16,14 +16,14 @@ impl<PinLinks: PinOps> Lautsprecher<PinLinks> {
     /// Erstellt ein neues Lautsprecher-Objekt.
     ///
     /// - `pin` der I/O-Pin, an welchem der linke Lautsprecher angeschlossen ist.
-    pub(crate) fn neu(pin: Pin<Output, PinLinks>) -> Self {
+    pub fn neu(pin: Pin<Output, PinLinks>) -> Self {
         Self { pin_links: pin }
     }
 
     /// Brief Spielt die gesamte Tonfolge der Schulglocke ab.
     ///
     /// Die Funktion blockiert so lange, bis die Tonfolge abgeschlossen ist
-    pub(crate) fn spiele_tonfolge(&mut self) {
+    pub fn spiele_tonfolge(&mut self) {
         self.spiele_ton(Note::G.frequenz(4), 820);
         self.spiele_ton(Note::E.frequenz(4), 820);
         self.spiele_ton(Note::C.frequenz(4), 820);
@@ -51,6 +51,7 @@ impl<PinLinks: PinOps> Lautsprecher<PinLinks> {
         // die Anzahl der abzuspielenden Perioden, um die gewünschte Dauer zu erreichen
         let anzahl = ((dauer_ms as f32 * frequenz / 1000.0) + 0.5) as u32;
 
+        // Rechteckwelle mit der richtigen Frequenz und Dauer auf dem Lautsprecher-Pin ausgeben
         for _ in 0..anzahl {
             self.pin_links.set_high();
             delay_us(periodendauer_us / 2);
@@ -87,8 +88,10 @@ impl Note {
     /// Die Frequenzen stammen aus der gleichstufigen Stimmung:
     /// <https://de.wikipedia.org/wiki/Gleichstufige_Stimmung#Frequenzberechnung>
     const fn frequenz(self, oktave: u8) -> f32 {
-        // Die Frequenzen der Note in der eingestrichenen Oktave (4)
+        // Die Frequenzen der Note in der eingestrichenen Oktave (4).
         // Die Frequenzen dieser Oktave sind leicht zu recherchieren
+        // Die Frequenzen ließen auch leicht berechnen. Da der Arduino aber keine
+        // Fließkommaberechnungen durchführen kann, arbeiten wir mit vorberechneten Werten.
         let notenfrequenz_oktave_4 = match self {
             Note::C => 261.6,
             Note::Cis => 277.2,

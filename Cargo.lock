@@ -206,10 +206,12 @@ name = "schulklingel-rs"
 version = "0.1.0"
 dependencies = [
  "arduino-hal",
+ "avr-device",
  "dcf77_utils",
  "embedded-hal 1.0.0",
  "nb 1.1.0",
  "panic-halt",
+ "radio_datetime_utils",
  "ufmt",
 ]
 
