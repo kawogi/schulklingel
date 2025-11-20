@@ -2,7 +2,7 @@
 //! Lautsprecher benötigt.
 
 use arduino_hal::{
-    delay_us,
+    delay_ms, delay_us,
     port::{mode::Output, Pin, PinOps},
 };
 
@@ -28,6 +28,17 @@ impl<PinLinks: PinOps> Lautsprecher<PinLinks> {
         self.spiele_ton(Note::E.frequenz(4), 820);
         self.spiele_ton(Note::C.frequenz(4), 820);
         self.spiele_ton(Note::G.frequenz(3), 1640);
+    }
+
+    /// Brief Spielt die gesamte Tonfolge der Schulglocke ab.
+    ///
+    /// Die Funktion blockiert so lange, bis die Tonfolge abgeschlossen ist
+    pub fn spiele_start(&mut self) {
+        self.spiele_ton(Note::C.frequenz(4), 50);
+        self.spiele_ton(Note::G.frequenz(4), 50);
+        self.spiele_ton(Note::C.frequenz(5), 50);
+        self.spiele_ton(Note::G.frequenz(5), 50);
+        self.spiele_ton(Note::C.frequenz(6), 50);
     }
 
     /// Spielt einen Ton als Rechteckwelle auf dem Lautsprecher ab.

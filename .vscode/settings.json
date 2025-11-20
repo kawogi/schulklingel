@@ -10,11 +10,21 @@
         "anzahl",
         "arduino",
         "Arduinos",
+        "atmega",
+        "compa",
+        "COMPA",
         "dauer",
         "frequenz",
         "lautsprecher",
+        "ocie",
         "oktave",
+        "prescale",
+        "PRESCALE",
+        "PRESCALER",
+        "tccr",
+        "timsk",
         "ufmt",
+        "uninit",
         "uwriteln"
     ]
 }
